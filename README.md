@@ -15,7 +15,10 @@ Dự án này xây dựng một hệ thống phân loại nhịp tim từ dữ l
 
 ## Cấu trúc dự án
 
-- `ECG_Classification.ipynb`: Notebook chính chứa toàn bộ pipeline từ tiền xử lý, tạo dataset, huấn luyện mô hình, đến đánh giá và suy luận.
+- `src/api.py`: FastAPI application và model inference.
+- `notebooks/ECG_Classification.ipynb`: Notebook chính chứa toàn bộ pipeline từ tiền xử lý, tạo dataset, huấn luyện mô hình, đến đánh giá và suy luận.
+- `checkpoints/`: Nơi đặt các model checkpoint đã huấn luyện, ví dụ `best_checkpoint.pth`.
+- `data/`: Nơi lưu dữ liệu ECG, dataset trung gian hoặc file đầu vào.
 - `README.md`: Tài liệu hướng dẫn dự án.
 
 ## Dữ liệu
@@ -48,12 +51,34 @@ Dự án gom các ký hiệu nhịp ECG về 5 nhóm:
 - wfdb
 - tqdm
 - torchinfo
+- fastapi
+- uvicorn
 
 ## Cài đặt nhanh
 
 ```bash
-pip install torch numpy pandas scipy matplotlib scikit-learn wfdb tqdm torchinfo
+pip install torch numpy pandas scipy matplotlib scikit-learn wfdb tqdm torchinfo fastapi uvicorn
 ```
+
+## FastAPI inference
+
+1. Đặt checkpoint `best_checkpoint` vào thư mục `checkpoints/`. File có thể có tên `best_checkpoint` hoặc `best_checkpoint.pth`.
+2. Chạy API:
+
+```bash
+uvicorn src.api:app --reload --host 0.0.0.0 --port 8000
+```
+
+3. Gửi yêu cầu POST đến `http://127.0.0.1:8000/predict` với body JSON:
+
+```json
+{
+  "ecg_signal": [0.1, 0.05, -0.02, ...],
+  "sampling_rate": 360
+}
+```
+
+4. Kết quả trả về gồm danh sách dự đoán từng nhịp, dự đoán chung theo majority vote và xác suất trung bình mỗi lớp.
 
 ## Hướng dẫn sử dụng
 
